@@ -4,8 +4,8 @@
 }
 
 #map {
-    height: 1080px;
-    width: 1920px;
+    height: 900px;
+    width: 1600px;
     margin: 20px auto;
 }
 
@@ -13,9 +13,4 @@
     width: 800px;
     height: 400px;
     margin: 20px auto;
-}
-
-footer {
-    background-color: gray;
-    text-align: center;
 }
