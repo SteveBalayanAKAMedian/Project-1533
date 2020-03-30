@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://api-maps.yandex.ru/2.1/?apikey=673da600-5536-4278-932d-30af4d7938c8&lang=ru_RU" type="text/javascript">
+        </script>
+        <script type="text/javascript">
+            ymaps.ready(init);
+            function init(){
+                var myMap = new ymaps.Map("map", {
+                    center: [55.76, 37.64],
+                    zoom: 7
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <div class="header">
+                <h2>Проект -- анализ ДТП РФ (пока в Москве)</h3>
+            </div>
+        </header>
+        <main>
+            <div class="picture" id="picture1">
+                <img src="Fatalities_per_accident.png">
+            </div>
+            <div class="picture">
+                <img src="Accident_types.png">
+            </div>
+            <div id="map"></div>
+        </main>
+    </body>
+</html>
