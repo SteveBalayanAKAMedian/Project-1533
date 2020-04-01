@@ -33,6 +33,7 @@ function init() {
 		let result = [];
 		// Параметр количества меток
 		let objectsCount = 1000;
+		let realCount = 0;
 		for (let i = 0; i < objectsCount; i++) {
 			let item = {
 				type: 'Feature',
@@ -51,9 +52,11 @@ function init() {
 					clusterCaption:
 						'<font size=3><b>Тип аварии: </b></font>' + data[i].crash_type_name,
 					hintContent: data[i].crash_reason
-				}
-			};
-			result.push(item);
+					}	
+				};
+			if(data[i].reg_name == "Москва") {	
+				result.push(item);
+			}
 		}
 		console.log('Данные для карт:', result);
 		// Закидываем данные в Я.Карты
