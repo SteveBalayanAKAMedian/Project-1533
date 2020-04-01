@@ -32,8 +32,7 @@ function init() {
 		// Формируем объект для Я.Карт
 		let result = [];
 		// Параметр количества меток
-		let objectsCount = 1000;
-		let realCount = 0;
+		let objectsCount = 10000;
 		for (let i = 0; i < objectsCount; i++) {
 			let item = {
 				type: 'Feature',
