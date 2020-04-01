@@ -53,7 +53,9 @@ function init() {
 					hintContent: data[i].crash_reason
 				}
 			};
-			result.push(item);
+			if(data[i].reg_name == 'Москва') {
+				result.push(item);
+			}
 		}
 		console.log('Данные для карт:', result);
 		// Закидываем данные в Я.Карты
