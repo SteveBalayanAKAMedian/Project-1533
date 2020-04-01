@@ -27,7 +27,7 @@ function init() {
 
 	// Запрашиваем данные ГИБДД
 	$.ajax({
-		url: 'safe_roads.json'
+		url: '2016.json'
 	}).done(function(data) {
 		// Формируем объект для Я.Карт
 		let result = [];
