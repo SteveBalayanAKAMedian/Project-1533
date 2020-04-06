@@ -6,59 +6,90 @@ function init() {
 			{
 				center: [55.76, 37.64],
 				zoom: 5
-			},
-			{
-				searchControlProvider: 'yandex#search'
 			}
-		),
-		objectManager = new ymaps.ObjectManager({
-			// Чтобы метки начали кластеризоваться, выставляем опцию.
-			clusterize: true,
-			// ObjectManager принимает те же опции, что и кластеризатор.
-			gridSize: 32,
-			clusterDisableClickZoom: true
-		});
+		);
+	objectManager = new ymaps.ObjectManager();
 
-	// Чтобы задать опции одиночным объектам и кластерам,
-	// обратимся к дочерним коллекциям ObjectManager.
-	objectManager.objects.options.set('preset', 'islands#greenDotIcon');
-	objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
-	myMap.geoObjects.add(objectManager);
-
-	// Запрашиваем данные ГИБДД
-	$.ajax({
-		url: '2016.json'
-	}).done(function(data) {
-		// Формируем объект для Я.Карт
-		let result = [];
-		// Параметр количества меток
-		let objectsCount = 10000;
-		for (let i = 0; i < objectsCount; i++) {
-			let item = {
-				type: 'Feature',
-				id: i,
-				geometry: {
-					type: 'Point',
-					coordinates: [Number(data[i].latitude), Number(data[i].longitude)]
-				},
-				properties: {
-					balloonContentHeader:
-						'<font size=3><b>Регион: </b></font>' + data[i].reg_name,
-					balloonContentBody:
-						'<font size=3><b>Местоположение: </b></font>' + data[i].address,
-					balloonContentFooter:
-						'<font size=3><b>Трасса/Дорога: </b></font>' + data[i].road_name,
-					clusterCaption:
-						'<font size=3><b>Тип аварии: </b></font>' + data[i].crash_type_name,
-					hintContent: data[i].crash_reason
-					}	
-				};
-			if(data[i].reg_name == "Москва") {	
-				result.push(item);
+	$.getJSON('mo.json') .done(function(data) {
+		for(var i = 0; i < 146; ++i) {
+			var arr = data['features'][i]['geometry']['coordinates'];
+			if(arr.length == 1) {
+				for(let j = 0; j < arr[0].length; ++j) {
+					arr[0][j][0] = Number(arr[0][j][0]);
+					arr[0][j][1] = Number(arr[0][j][1]);
+				}
+				var Polygon = new ymaps.GeoObject({
+					geometry: {
+						type: "Polygon",
+						coordinates: data[0],
+						fillRule: "nonZero"
+					},
+					properties:{
+						// Содержимое балуна.
+						balloonContent: "Район"
+					}
+				}, {
+					// Описываем опции геообъекта.
+			// Цвет заливки.
+					fillColor: '#00FF00',
+			// Цвет обводки.
+					strokeColor: '#0000FF',
+			// Общая прозрачность (как для заливки, так и для обводки).
+					opacity: 0.5,
+			// Ширина обводки.
+					strokeWidth: 5,
+			// Стиль обводки.
+					strokeStyle: 'shortdash'
+				});
+				objectManager.add(Polygon);
 			}
 		}
-		console.log('Данные для карт:', result);
-		// Закидываем данные в Я.Карты
-		objectManager.add(result);
-	});
+		console.log(objectManager);
+		myMap.geoObjects.add(objectManager);
+	}); 
+		
+	//datajson = datajson['responseJSON']; 
+	/*let datajson;
+	let req = new XMLHttpRequest();
+	req.open('GET', 'mo.json');
+	req.responseType = 'json';
+	req.send();
+	req.onload = function(datajson) {
+		datajson = req.response;
+	} */
+	//console.log(datajson);
+	//console.log(req);
+	/*for(var i = 0; i < 146; ++i) {
+		var arr = data['features'][i]['geometry']['coordinates'];
+		if(arr.length == 1) {
+			for(let j = 0; j < arr[0].length; ++j) {
+				arr[0][j][0] = Number(arr[0][j][0]);
+				arr[0][j][1] = Number(arr[0][j][1]);
+			}
+			var Polygon = new ymaps.GeoObject({
+				geometry: {
+					type: "Polygon",
+					coordinates: data[0],
+					fillRule: "nonZero"
+				},
+				properties:{
+					// Содержимое балуна.
+					balloonContent: "Район ебать"
+				}
+			}, {
+				// Описываем опции геообъекта.
+        // Цвет заливки.
+        		fillColor: '#00FF00',
+        // Цвет обводки.
+        		strokeColor: '#0000FF',
+        // Общая прозрачность (как для заливки, так и для обводки).
+        		opacity: 0.5,
+        // Ширина обводки.
+        		strokeWidth: 5,
+        // Стиль обводки.
+        		strokeStyle: 'shortdash'
+			});
+			myMap.geoObjects.add(Polygon);
+		}
+	} */
 }
