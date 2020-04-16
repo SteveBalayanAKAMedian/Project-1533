@@ -24,7 +24,7 @@ function init() {
     //кнопка очистки карты, полной очистки
     let clearMap = document.getElementById('clearMap');
     clearMap.addEventListener('click', () => {
-        myMap.geoObjects.removeAll();
+        objectManager.removeAll();
     })
     
     //тут для красоты

@@ -17,7 +17,7 @@ app.get('/car_accident_in_region', function(req, res) {
     let year = req.query.year;
     //тестовый вариант, идём не по всему файлу
     //let size = carAccidents[year].length;
-    let size = 100;
+    let size = 1000;
     let arr = [];
     for (let i = 0; i < size; i++) {
         if (carAccidents[year][i]['reg_name'] === regionName) {
