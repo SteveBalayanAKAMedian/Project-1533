@@ -1,5 +1,6 @@
 let myMap;
 let objectManager;
+let result = []; //объекты внутри objectManager'a
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -81,7 +82,6 @@ function showAccidents(carAccidents, year) {
     console.log(carAccidents);
     objectManager.objects.options.set('preset', 'islands#greenDotIcon');
     objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
-    let result = [];
     for (let i = 0; i < carAccidents.length; i++) {
         let item =  {
             type: 'Feature',
@@ -95,4 +95,3 @@ function showAccidents(carAccidents, year) {
     }
     objectManager.add(result);
 }
-
