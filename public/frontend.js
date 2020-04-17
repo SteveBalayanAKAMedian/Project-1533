@@ -26,6 +26,7 @@ function init() {
     let clearMap = document.getElementById('clearMap');
     clearMap.addEventListener('click', () => {
         objectManager.removeAll();
+        result = [];
     })
     
     //тут для красоты
@@ -68,8 +69,8 @@ function initMap() {
 function querySearchByRegion() {
     let region = searchByRegion.value;
     let year = searchByYear.value;
-    searchByRegion.value = "";
-    searchByYear.value = "";
+    //searchByRegion.value = "";
+    //searchByYear.value = "";
     axios.get('/car_accident_in_region', { params: { regionName: region, year: year } }).then(function (response) {
         console.log(response);
         console.log(response.data.length);
@@ -79,6 +80,7 @@ function querySearchByRegion() {
 
 //отображение меток, TODO -- задавать цвет в зависимости от года
 function showAccidents(carAccidents, year) {
+    objectManager.removeAll();
     console.log(carAccidents);
     objectManager.objects.options.set('preset', 'islands#greenDotIcon');
     objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
