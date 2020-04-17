@@ -1,6 +1,7 @@
 let myMap;
 let objectManager;
 let result = []; //объекты внутри objectManager'a
+let allRequiredRegions = [];
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -15,6 +16,8 @@ function init() {
             console.log('Server is on!');
         });
     });
+
+
     ymaps.ready(initMap);
     //поисковая строка отображения ДТП по регионам
     let searchByRegion = document.getElementById('searchByRegion');
@@ -22,12 +25,10 @@ function init() {
     let searchByYear = document.getElementById('searchByYear');
     //кнопка отправки запроса поисковой строки выше
     let btnSendSearchByRegion = document.getElementById('btnSendSearchByRegion');
-    //кнопка очистки карты, полной очистки
-    let clearMap = document.getElementById('clearMap');
-    clearMap.addEventListener('click', () => {
-        objectManager.removeAll();
-        result = [];
-    })
+    //кнопка очистки карты, полной очистки от меток
+    let btnClearMap = document.getElementById('btnClearMap');
+    //есть шакальство с кластеризацией, TODO -- fix it
+    btnClearMap.addEventListener('click', clearWholeMap);
     
     //тут для красоты
     searchByRegion.value= "Название региона";
@@ -55,6 +56,7 @@ function initMap() {
             searchControlProvider: 'yandex#search'
         }
     );
+    //тут очень сильно шакалят кластеры, я вообще не понимаю, что это -- TODO: fix
     objectManager = new ymaps.ObjectManager({
         // Чтобы метки начали кластеризоваться, выставляем опцию.
         clusterize: true,
@@ -63,6 +65,8 @@ function initMap() {
         clusterDisableClickZoom: true
     });
     myMap.geoObjects.add(objectManager);
+    objectManager.objects.options.set('preset', 'islands#greenDotIcon');
+    objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
 }
 
 //запрос на сервер по региону и году
@@ -74,26 +78,45 @@ function querySearchByRegion() {
     axios.get('/car_accident_in_region', { params: { regionName: region, year: year } }).then(function (response) {
         console.log(response);
         console.log(response.data.length);
-        showAccidents(response.data, year);
+        if (response.data.length === 0 || allRequiredRegions.find((element, index, array) => {
+            return (array[index][0] === region && array[index][1] === year);
+        })) {
+            alert('Error, send ur request');
+        }
+        else {
+            allRequiredRegions.push([region, year]);
+            showAccidents(response.data, year);
+        }
+        console.log(allRequiredRegions);
     });
 }
 
 //отображение меток, TODO -- задавать цвет в зависимости от года
 function showAccidents(carAccidents, year) {
     objectManager.removeAll();
-    console.log(carAccidents);
-    objectManager.objects.options.set('preset', 'islands#greenDotIcon');
-    objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
+
+    console.log(result);
+
     for (let i = 0; i < carAccidents.length; i++) {
         let item =  {
             type: 'Feature',
-            id: i,
+            //id: 1,
             geometry: {
                 type: 'Point',
                 coordinates: carAccidents[i]
             } 
-        }
+        };
         result.push(item);
     }
+    console.log(result);
+    objectManager.add(result);
+}
+
+function clearWholeMap() {
+    result.splice(0);
+    allRequiredRegions.splice(0);
+    console.log(result);
+    console.log(allRequiredRegions);
+    objectManager.removeAll();
     objectManager.add(result);
 }
