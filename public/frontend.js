@@ -2,6 +2,7 @@ let myMap;
 let objectManager;
 let result = []; //объекты внутри objectManager'a
 let allRequiredRegions = [];
+let idOfMarks = 0; //считаем айдишники всех меток для корректной работы 
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -27,7 +28,6 @@ function init() {
     let btnSendSearchByRegion = document.getElementById('btnSendSearchByRegion');
     //кнопка очистки карты, полной очистки от меток
     let btnClearMap = document.getElementById('btnClearMap');
-    //есть шакальство с кластеризацией, TODO -- fix it
     btnClearMap.addEventListener('click', clearWholeMap);
     
     //тут для красоты
@@ -73,8 +73,6 @@ function initMap() {
 function querySearchByRegion() {
     let region = searchByRegion.value;
     let year = searchByYear.value;
-    //searchByRegion.value = "";
-    //searchByYear.value = "";
     axios.get('/car_accident_in_region', { params: { regionName: region, year: year } }).then(function (response) {
         console.log(response);
         console.log(response.data.length);
@@ -100,12 +98,13 @@ function showAccidents(carAccidents, year) {
     for (let i = 0; i < carAccidents.length; i++) {
         let item =  {
             type: 'Feature',
-            //id: 1,
+            id: idOfMarks,
             geometry: {
                 type: 'Point',
                 coordinates: carAccidents[i]
             } 
         };
+        idOfMarks += 1;
         result.push(item);
     }
     console.log(result);
@@ -113,6 +112,7 @@ function showAccidents(carAccidents, year) {
 }
 
 function clearWholeMap() {
+    idOfMarks = 0;
     result.splice(0);
     allRequiredRegions.splice(0);
     console.log(result);
