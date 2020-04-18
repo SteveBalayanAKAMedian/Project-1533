@@ -98,23 +98,24 @@ function showAccidents(carAccidents, year) {
     for (let i = 0; i < carAccidents.length; i++) {
         let pointColor = 'green';
         if(year == 2017) {
-            pointColor = 'blue';
+            pointColor = 'blue'
         } 
         else {
             if(year == 2018) {
-                pointColor = 'red';
+                pointColor = 'red'
             }
-        }
-        
-        let fatality = 'attention';
+        };
+
+        let fatality = 'glass';
         if(carAccidents[i].victims != 0)
         {
-            fatality = 'christian';
-        } else {
+            fatality = 'music'
+        } 
+        else {
             if(carAccidents[i].fatalities != 0) {
-                fatality = 'medical';
+                fatality = 'home'
             }
-        }
+        };
 
         let item =  {
             type: 'Feature',
