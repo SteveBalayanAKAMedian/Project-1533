@@ -96,13 +96,46 @@ function showAccidents(carAccidents, year) {
     console.log(result);
 
     for (let i = 0; i < carAccidents.length; i++) {
+        let pointColor = 'green';
+        if(year == 2017) {
+            pointColor = 'blue';
+        } 
+        else {
+            if(year == 2018) {
+                pointColor = 'red';
+            }
+        }
+        
+        let fatality = 'attention';
+        if(carAccidents[i].victims != 0)
+        {
+            fatality = 'christian';
+        } else {
+            if(carAccidents[i].fatalities != 0) {
+                fatality = 'medical';
+            }
+        }
+
         let item =  {
             type: 'Feature',
             id: idOfMarks,
             geometry: {
                 type: 'Point',
-                coordinates: carAccidents[i]
-            } 
+                coordinates: carAccidents[i].coordinates
+            },
+            properties: {
+                balloonContentHeader:
+                    '<font size=3><b>Регион: </b></font>' + carAccidents[i].region,
+                balloonContentBody:
+					'<font size=3><b>Погибшие: </b></font>' + carAccidents[i].victims,
+				balloonContentFooter:
+		    			'<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].fatalities,
+            },
+            options: {
+                preset: 'islands#glyphIcon',
+                iconGlyph: fatality,
+                iconColor: pointColor
+            }
         };
         idOfMarks += 1;
         result.push(item);
