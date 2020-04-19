@@ -2,3 +2,6 @@
     width: 1280px;
     height: 720px;
 }
+.ymaps-2-1-76-controls__control_toolbar{
+    visibility: hidden;
+}
