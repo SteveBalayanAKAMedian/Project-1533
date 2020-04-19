@@ -1,0 +1,24 @@
+{
+  "name": "project-1533",
+  "version": "1.0.0",
+  "main": "backend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SteveBalayanAKAMedian/Project-1533.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SteveBalayanAKAMedian/Project-1533/issues"
+  },
+  "homepage": "https://github.com/SteveBalayanAKAMedian/Project-1533#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jquery": "^3.5.0"
+  },
+  "devDependencies": {},
+  "description": ""
+}
