@@ -4,7 +4,7 @@ const app = express();
 class CarAccident { //Объекты этого класса передаются во фронт для вывода меток
         constructor(coordinates, region, victims, fatalities) {
           this.coordinates = coordinates; 
-          this.victims = victims; //Жертвы (живые)
+          this.victims = victims; //Пострадавшие
           this.region = region;
           this.fatalities = fatalities; //Погибшие
     }
@@ -18,8 +18,6 @@ app.use(express.static('public')); //все данные лежат в папк�
 app.get('/hello', function(req, res) {
     res.send('Server is on!');
 });
-
-
 
 //отправляем с сервера описания ДТП в регионе запроса
 app.get('/car_accident_in_region', function(req, res) {
