@@ -137,9 +137,7 @@ function showAccidents(carAccidents, year) {
                 balloonContentHeader:
                     '<font size=3><b>Регион: </b></font>' + carAccidents[i].region,
                 balloonContentBody:
-					'<font size=3><b>Погибшие: </b></font>' + carAccidents[i].victims,
-				balloonContentFooter:
-		    			'<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].fatalities,
+					'<font size=3><b>Погибшие: </b></font>' + carAccidents[i].victims + '<br>' + '<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].fatalities,
             },
             options: {
                 preset: 'islands#glyphIcon',
