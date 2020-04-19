@@ -33,12 +33,17 @@ function init() {
     //тут для красоты
     searchByRegion.value= "Название региона";
     searchByYear.value= "Год поиска";
-    searchByRegion.addEventListener('click', () => {
-        searchByRegion.value = "";
-    });
-    searchByYear.addEventListener('click', () => {
-        searchByYear.value = "";
-    });
+    let cityNameTextBox = false; //Если правда, то текст стирали, если ложь, то не стирали
+    let yearNumberTextBox = false; //Если правда, то текст стирали, если ложь, то не стирали
+    searchByRegion.addEventListener('click', textBoxCleaner(cityNameTextBox));
+    searchByYear.addEventListener('click', textBoxCleaner(yearNumberTextBox));
+    function textBoxCleaner(flag)
+    {
+        if(!flag) {
+            searchByRegion.value = "";
+            flag = true;
+        }
+    }
 
     //запрашиваем у сервера данные для отображения
     btnSendSearchByRegion.addEventListener('click', querySearchByRegion);
@@ -106,10 +111,10 @@ function showAccidents(carAccidents, year) {
             }
         };
 
-        let fatality = 'glass';
+        let fatality = 'music';
         if(carAccidents[i].victims != 0)
         {
-            fatality = 'music'
+            fatality = 'heart'
         } 
         else {
             if(carAccidents[i].fatalities != 0) {
