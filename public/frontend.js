@@ -101,9 +101,7 @@ function querySearchByRegion() {
 //отображение меток, TODO -- задавать цвет в зависимости от года
 function showAccidents(carAccidents, year) {
     objectManager.removeAll();
-
     console.log(result);
-
     for (let i = 0; i < carAccidents.length; i++) {
         let pointColor = 'green';
         if(year == 2017) {
@@ -137,9 +135,7 @@ function showAccidents(carAccidents, year) {
                 balloonContentHeader:
                     '<font size=3><b>Регион: </b></font>' + carAccidents[i].region,
                 balloonContentBody:
-					'<font size=3><b>Погибшие: </b></font>' + carAccidents[i].victims,
-				balloonContentFooter:
-		    			'<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].fatalities,
+					'<font size=3><b>Погибшие: </b></font>' + carAccidents[i].victims + '<br>' + '<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].fatalities,
             },
             options: {
                 preset: 'islands#glyphIcon',
