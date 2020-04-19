@@ -101,9 +101,7 @@ function querySearchByRegion() {
 //отображение меток, TODO -- задавать цвет в зависимости от года
 function showAccidents(carAccidents, year) {
     objectManager.removeAll();
-
     console.log(result);
-
     for (let i = 0; i < carAccidents.length; i++) {
         let pointColor = 'green';
         if (year == 2017) {

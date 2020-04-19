@@ -19,8 +19,6 @@ app.get('/hello', function(req, res) {
     res.send('Server is on!');
 });
 
-
-
 //отправляем с сервера описания ДТП в регионе запроса
 app.get('/car_accident_in_region', function(req, res) {
     let regionName = req.query.regionName;
