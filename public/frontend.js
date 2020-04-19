@@ -36,13 +36,13 @@ function init() {
     let cityNameTextBox = false; //Если правда, то текст стирали, если ложь, то не стирали
     let yearNumberTextBox = false; //Если правда, то текст стирали, если ложь, то не стирали
     searchByRegion.addEventListener('click', () => {
-        if(!cityNameTextBox) {
+        if (!cityNameTextBox) {
             searchByRegion.value = "";
             cityNameTextBox = true;
         }
     });
     searchByYear.addEventListener('click', () => {
-        if(!yearNumberTextBox) {
+        if (!yearNumberTextBox) {
             searchByYear.value = "";
             yearNumberTextBox = true;
         }
@@ -75,7 +75,7 @@ function initMap() {
     });
     myMap.geoObjects.add(objectManager);
     objectManager.objects.options.set('preset', 'islands#greenDotIcon');
-    objectManager.clusters.options.set('preset', 'islands#greenClusterIcons');
+    objectManager.clusters.options.set('preset', 'islands#orangeClusterIcons');
 }
 
 //запрос на сервер по региону и году
@@ -106,25 +106,20 @@ function showAccidents(carAccidents, year) {
 
     for (let i = 0; i < carAccidents.length; i++) {
         let pointColor = 'green';
-        if(year == 2017) {
+        if (year == 2017) {
             pointColor = 'blue'
         } 
-        else {
-            if(year == 2018) {
-                pointColor = 'red'
-            }
-        };
+        else if (year == 2018) {
+            pointColor = 'red'
+        }
 
         let fatality = 'music';
-        if(carAccidents[i].victims != 0)
-        {
+        if (carAccidents[i].victims != 0) {
             fatality = 'heart'
         } 
-        else {
-            if(carAccidents[i].fatalities != 0) {
+        else if (carAccidents[i].fatalities != 0) {
                 fatality = 'home'
-            }
-        };
+        }
 
         let item =  {
             type: 'Feature',

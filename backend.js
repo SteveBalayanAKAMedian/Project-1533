@@ -4,7 +4,7 @@ const app = express();
 class CarAccident { //Объекты этого класса передаются во фронт для вывода меток
         constructor(coordinates, region, victims, fatalities) {
           this.coordinates = coordinates; 
-          this.victims = victims; //Жертвы (живые)
+          this.victims = victims; //Пострадавшие
           this.region = region;
           this.fatalities = fatalities; //Погибшие
     }
