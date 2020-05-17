@@ -14,6 +14,10 @@ carAccidents['2016'] = require('./2016.json');
 carAccidents['2017'] = require('./2017.json');
 carAccidents['2018'] = require('./2018.json');
 
+let citiesDistricts = new Map();
+citiesDistricts.set('Moscow', require('./MSK.json'));
+citiesDistricts.set('SPB', require('./SPB.json'));
+
 app.use(express.static('public')); //все данные лежат в папке public
 app.get('/hello', function(req, res) {
     res.send('Server is on!');
@@ -40,6 +44,19 @@ app.get('/car_accident_in_region', function(req, res) {
         }
     }
     res.send(arr);
+});
+
+app.get('/districts_coordinates', function(req, res) {
+    let cityName = req.query.cityName;
+    if(cityName == 'Moсква') {
+        cityName = 'Moscow';
+    }
+    let arr = [];
+    console.log(citiesDistricts[cityName][0]);
+    //for(let i = 0; i < citiesDistricts[cityName]['features'].Length; i++) {
+    //    console.log(citiesDistricts[cityName]['features'][i]['geometry']['coordinates']);
+    //    arr.push(citiesDistricts[cityName]['features'][i]['geometry']['coordinates']);
+    //}
 });
 
 //поднимаем на локалхосте

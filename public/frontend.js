@@ -51,6 +51,9 @@ function init() {
 
     //запрашиваем у сервера данные для отображения
     btnSendSearchByRegion.addEventListener('click', querySearchByRegion);
+    let chooseCitywithDistricts = document.getElementById('chooseCitywithDistricts');
+    let showDistricts = document.getElementById('showDistricts');
+    showDistricts.addEventListener('click', showAllDistricts)    
 }
 
 //инициализация самой карты
@@ -153,4 +156,11 @@ function clearWholeMap() {
     console.log(allRequiredRegions);
     objectManager.removeAll();
     objectManager.add(result);
+}
+
+function showAllDistricts() {
+    let cityName = chooseCitywithDistricts.value;
+    axios.get('/districts_coordinates', { params: { city: cityName } }).then(function(response) {
+            
+    });
 }
