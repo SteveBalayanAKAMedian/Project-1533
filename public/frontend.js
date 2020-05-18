@@ -3,6 +3,7 @@ let objectManager;
 let result = []; //объекты внутри objectManager'a
 let allRequiredRegions = [];
 let idOfMarks = 0; //считаем айдишники всех меток для корректной работы 
+let idOfPolygons = 0;
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -101,7 +102,7 @@ function querySearchByRegion() {
     });
 }
 
-//отображение меток, TODO -- задавать цвет в зависимости от года
+
 function showAccidents(carAccidents, year) {
     objectManager.removeAll();
     console.log(result);
@@ -160,7 +161,21 @@ function clearWholeMap() {
 
 function showAllDistricts() {
     let cityName = chooseCitywithDistricts.value;
+    let rez = [];
     axios.get('/districts_coordinates', { params: { city: cityName } }).then(function(response) {
-            
+        for(let i = 0; i < response.data.length; i++)
+        {    
+            let item = {
+                type: "Feature",
+                id: i,
+                geometry: {
+                    type: "Polygon",
+                    coordinates: response.data[i]
+                }
+            };
+            rez.push(item);
+            console.log(rez);
+        }
+        objectManager.add(rez);
     });
 }

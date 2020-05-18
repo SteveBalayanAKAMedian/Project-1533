@@ -47,10 +47,11 @@ app.get('/car_accident_in_region', function(req, res) {
 
 app.get('/districts_coordinates', function(req, res) {
     let arr = [];
-    for(let i = 0; i < citiesDistricts["Москва"].feature.length; i++) {
-        console.log(citiesDistricts["Москва"].feature[i]['geometry']['coordinates']);
-        arr.push(citiesDistricts["Москва"].feature[i]['geometry']['coordinates']);
+    for(let i = 0; i < citiesDistricts["Москва"].features.length; i++) {
+        //console.log(citiesDistricts["Москва"].features[i]['geometry']['coordinates']);
+        arr.push(Number(citiesDistricts["Москва"].features[i]['geometry']['coordinates']));
     }
+    res.send(arr);
 });
 
 //поднимаем на локалхосте
