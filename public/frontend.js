@@ -163,19 +163,15 @@ function showAllDistricts() {
     let cityName = chooseCitywithDistricts.value;
     let rez = [];
     axios.get('/districts_coordinates', { params: { city: cityName } }).then(function(response) {
-        for(let i = 0; i < response.data.length; i++)
+        for(let i = 0; i < 2; i++)
         {    
-            let item = {
-                type: "Feature",
-                id: i,
-                geometry: {
-                    type: "Polygon",
-                    coordinates: response.data[i]
-                }
-            };
+            let item = new ymaps.Polygon( [[[55.67, 37.55], [55.64, 37.52], [55.64, 37.60]], {fillColor: "#00FF00", strokeWidth: 5}, {}]); 
+            myMap.geoObjects.add(item);
             rez.push(item);
             console.log(rez);
         }
-        objectManager.add(rez);
+       
+        //objectManager.add(item);
+        console.log(objectManager);
     });
 }

@@ -48,10 +48,12 @@ app.get('/car_accident_in_region', function(req, res) {
 app.get('/districts_coordinates', function(req, res) {
     let arr = [];
     for(let i = 0; i < citiesDistricts["Москва"].features.length; i++) {
-        //console.log(citiesDistricts["Москва"].features[i]['geometry']['coordinates']);
-        arr.push(Number(citiesDistricts["Москва"].features[i]['geometry']['coordinates']));
+        //for(let j = 0; j < citiesDistricts["Москва"].features[i].geometry.length; j++)
+        console.log(citiesDistricts["Москва"].features[i].geometry.coordinates);
+        arr.push(citiesDistricts["Москва"].features[i].geometry.coordinates);
     }
     res.send(arr);
+    //res.send(Number(citiesDistricts['Москва'].features[0].geometry.coordinates));
 });
 
 //поднимаем на локалхосте
