@@ -161,17 +161,21 @@ function clearWholeMap() {
 
 function showAllDistricts() {
     let cityName = chooseCitywithDistricts.value;
+    console.log(cityName);
     let rez = [];
     axios.get('/districts_coordinates', { params: { city: cityName } }).then(function(response) {
-        for(let i = 0; i < 2; i++)
-        {    
-            let item = new ymaps.Polygon( [[[55.67, 37.55], [55.64, 37.52], [55.64, 37.60]], {fillColor: "#00FF00", strokeWidth: 5}, {}]); 
-            myMap.geoObjects.add(item);
-            rez.push(item);
-            console.log(rez);
+        for (let i = 0; i < response.data.length; i++) {
+            for (let j = 0; j < response.data[i].length; j++) {
+                for (let k = 0; k < response.data[i][j][0].length; k++) { //нулевое -- из-за обёртки
+                    let a = Number(response.data[i][j][0][k][0]);
+                    let b = Number(response.data[i][j][0][k][1]);
+                    response.data[i][j][0][k][1] = a;
+                    response.data[i][j][0][k][0] = b;
+                }
+                let item = new ymaps.Polygon([response.data[i][j][0], {fillColor: "#00FF00", strokeWidth: 5}, {}]);
+                myMap.geoObjects.add(item);
+                console.log(response.data[i][j][0]); 
+            }
         }
-       
-        //objectManager.add(item);
-        console.log(objectManager);
     });
 }

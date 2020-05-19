@@ -17,6 +17,7 @@ carAccidents['2018'] = require('./2018.json');
 let citiesDistricts = {};
 citiesDistricts["Москва"] = require('./Msk_Dictrict.json');
 
+
 app.use(express.static('public')); //все данные лежат в папке public
 app.get('/hello', function(req, res) {
     res.send('Server is on!');
@@ -47,13 +48,11 @@ app.get('/car_accident_in_region', function(req, res) {
 
 app.get('/districts_coordinates', function(req, res) {
     let arr = [];
-    for(let i = 0; i < citiesDistricts["Москва"].features.length; i++) {
-        //for(let j = 0; j < citiesDistricts["Москва"].features[i].geometry.length; j++)
-        console.log(citiesDistricts["Москва"].features[i].geometry.coordinates);
-        arr.push(citiesDistricts["Москва"].features[i].geometry.coordinates);
+    let cityName = req.query.city;
+    for(let i = 0; i < citiesDistricts[cityName].features.length; i++) {
+        arr.push(citiesDistricts[cityName].features[i].geometry.coordinates);
     }
     res.send(arr);
-    //res.send(Number(citiesDistricts['Москва'].features[0].geometry.coordinates));
 });
 
 //поднимаем на локалхосте
