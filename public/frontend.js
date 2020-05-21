@@ -22,12 +22,21 @@ function init() {
     //кнопка очистки карты, полной очистки от меток
     let btnClearMap = document.getElementById('btnClearMap');
     btnClearMap.addEventListener('click', clearWholeMap);
-    
+    let chooseCitywithDistricts = document.getElementById('chooseCitywithDistricts');
     //тут для красоты
+    chooseCitywithDistricts.value = 'Название города';
     searchByRegion.value= "Название региона";
-    searchByYear.value= "Год поиска";
+    searchByYear.value= "Год";
     let cityNameTextBox = false; //Если правда, то текст стирали, если ложь, то не стирали
-    let yearNumberTextBox = false; //Если правда, то текст стирали, если ложь, то не стирали
+    let yearNumberTextBox = false; 
+    let districtsTextBox = false;
+    let numberOfAccidentsTextBox = false;
+    chooseCitywithDistricts.addEventListener('click', () => {
+        if(!districtsTextBox) {
+            chooseCitywithDistricts.value = "";
+            districtsTextBox = true;
+        }
+    })
     searchByRegion.addEventListener('click', () => {
         if (!cityNameTextBox) {
             searchByRegion.value = "";
@@ -42,15 +51,22 @@ function init() {
     });
     
     btnSendSearchByRegion.addEventListener('click', querySearchByRegion);
-    let chooseCitywithDistricts = document.getElementById('chooseCitywithDistricts');
     let btnShowDistricts = document.getElementById('btnShowDistricts');
     btnShowDistricts.addEventListener('click', showDistricts)    
-
+    let firstNumberOfAccidents = document.getElementById('firstNumberOfAccidents');
+    firstNumberOfAccidents.value = "Искать среди первых N ДТП";
+    firstNumberOfAccidents.addEventListener('click', () => {
+        if(!numberOfAccidentsTextBox) {
+            numberOfAccidentsTextBox = true;
+            firstNumberOfAccidents.value = "";
+        }
+    });
     let btnEraseSearchByRegion = document.getElementById('btnEraseSearchByRegion');
     btnEraseSearchByRegion.addEventListener('click', removeSearchByRegion);
-
     let btnRemoveDistrict = document.getElementById('btnRemoveDistrict');
     btnRemoveDistrict.addEventListener('click', clearDistricts)
+    let btnSendNumberOfAccidents = document.getElementById('btnSendNumberOfAccidents');
+    btnSendNumberOfAccidents.addEventListener('click', postSendNumberOfAccidents);
 }
 
 //инициализация самой карты
@@ -153,6 +169,13 @@ function removeSearchByRegion() {
     }
 }
 
+function postSendNumberOfAccidents() {
+    let num = Number(firstNumberOfAccidents.value);
+    axios.get('/post_first_searches', { params: { firstN: num } }).then(function (response) {
+        console.log(response.data);
+    });
+}
+
 //запрос и отображене районов города
 function showDistricts() {
     let cityName = chooseCitywithDistricts.value;
@@ -177,7 +200,7 @@ function showDistricts() {
                     districtsCoordinates[i][j][0][k][0] = b;
                 }
                 //подумать над дизайном
-                let item = new ymaps.Polygon([districtsCoordinates[i][j][0]], { balloonContent: districtsNames[i] }, { fillColor: "#00FF00", strokeWidth: 2 });
+                let item = new ymaps.Polygon([districtsCoordinates[i][j][0]], { balloonContentHeader: districtsNames[i], balloonContentBody: 'Тест' }, { fillOpacity: 0.5, strokeWidth: 1 });
                 myMap.geoObjects.add(item);
                 tmp.push(item);
             }
