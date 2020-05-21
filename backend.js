@@ -9,11 +9,20 @@ class CarAccident { //Объекты этого класса передаютс�
           this.fatalities = fatalities; //Погибшие
     }
 }
+//TODO -- написать класс по району
+//вызываем наши БД
+//мб стоит нормально переписать на MongoDB
+//в общем, это мапы
 let carAccidents = {};
 carAccidents['2016'] = require('./2016.json');
 carAccidents['2017'] = require('./2017.json');
 carAccidents['2018'] = require('./2018.json');
 
+let citiesDistricts = {};
+citiesDistricts["Москва"] = require('./Msk_Dictrict.json');
+citiesDistricts['Санкт-Петербург'] = require('./SPB.json');
+
+//TODO -- подумать над тем, как нам сделать вложенность, т.е. наш сайт со статистикой и инфой
 app.use(express.static('public')); //все данные лежат в папке public
 app.get('/hello', function(req, res) {
     res.send('Server is on!');
@@ -26,7 +35,6 @@ app.get('/car_accident_in_region', function(req, res) {
     //тестовый вариант, идём не по всему файлу
     //let size = carAccidents[year].length;
     let size = 1000;
-    console.log('test');
     let arr = [];
     for (let i = 0; i < size; i++) {
         if (carAccidents[year][i]['reg_name'] === regionName) {
@@ -40,6 +48,18 @@ app.get('/car_accident_in_region', function(req, res) {
         }
     }
     res.send(arr);
+});
+
+//Отправляем координаты районов города
+app.get('/districts_coordinates', function(req, res) {
+    let arrCoordinates = [];
+    let arrNames = [];
+    let cityName = req.query.city;
+    for(let i = 0; i < citiesDistricts[cityName].features.length; i++) {
+        arrNames.push(citiesDistricts[cityName].features[i].properties.DistrName);
+        arrCoordinates.push(citiesDistricts[cityName].features[i].geometry.coordinates);
+    }
+    res.send([arrNames, arrCoordinates]);
 });
 
 //поднимаем на локалхосте
