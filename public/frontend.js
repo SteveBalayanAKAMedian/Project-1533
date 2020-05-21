@@ -1,25 +1,17 @@
 let myMap;
 let objectManager;
-let result = []; //объекты внутри objectManager'a
-let allRequiredRegions = [];
-let idOfMarks = 0; //считаем айдишники всех меток для корректной работы 
-let idOfPolygons = 0;
+let result = new Map(); //объекты внутри objectManager'a
+let allRequiredRegions = []; //все показанные регионы, хранит пару из названия региона и года
+let idOfMarks = 0; //считаем айдишники всех меток для корректной работы
 
 document.addEventListener('DOMContentLoaded', init);
 
 //инициализация всего
 //TODO -- 100500 кнопок переписать на нормальные менюшки
+//TODO -- переписать init, добавив много маленьких функций-инициализаторов, а то много и не оч понятно/приятно
+//функция по размеру должна влезать на один экран
+//у меня вот не влезла
 function init() {
-    //проверка работы сервера
-    let testServer = document.getElementById('testServer');
-    testServer.addEventListener('click', () => {
-        axios.get('/hello').then(function (response) {
-            console.log(response);
-            console.log('Server is on!');
-        });
-    });
-
-
     ymaps.ready(initMap);
     //поисковая строка отображения ДТП по регионам
     let searchByRegion = document.getElementById('searchByRegion');
@@ -49,12 +41,13 @@ function init() {
         }
     });
     
-
-    //запрашиваем у сервера данные для отображения
     btnSendSearchByRegion.addEventListener('click', querySearchByRegion);
     let chooseCitywithDistricts = document.getElementById('chooseCitywithDistricts');
-    let showDistricts = document.getElementById('showDistricts');
-    showDistricts.addEventListener('click', showAllDistricts)    
+    let btnShowDistricts = document.getElementById('btnShowDistricts');
+    btnShowDistricts.addEventListener('click', showAllDistricts)    
+
+    let btnEraseSearchByRegion = document.getElementById('btnEraseSearchByRegion');
+    btnEraseSearchByRegion.addEventListener('click', removeSearchByRegion)
 }
 
 //инициализация самой карты
@@ -86,7 +79,7 @@ function initMap() {
 function querySearchByRegion() {
     let region = searchByRegion.value;
     let year = searchByYear.value;
-    if(region == '' || region == 'Название региона' || year == '' || year == 'Год поиска') { //чтобы не мучить сервер странными запросами, отсекаем на фронте их
+    if (region == '' || region == 'Название региона' || year == '' || year == 'Год поиска') { //чтобы не мучить сервер странными запросами, отсекаем на фронте их
         alert('Что-то не так с вашим запросом');
         return;
     }
@@ -106,8 +99,10 @@ function querySearchByRegion() {
     });
 }
 
-
+//непосредственно отображение ДТП
 function showAccidents(carAccidents, year) {
+    let region = searchByRegion.value;
+    let tmp = [];
     console.log(result);
     for (let i = 0; i < carAccidents.length; i++) {
         let pointColor = 'green';
@@ -140,23 +135,40 @@ function showAccidents(carAccidents, year) {
             }
         };
         idOfMarks += 1;
-        result.push(item);
+        tmp.push(item);
     }
-    console.log(result);
-    objectManager.add(result);
+    console.log(tmp);
+    objectManager.add(tmp);
+    result.set(region + year, tmp);
+    console.log(result.get(region + year));
 }
 
-function clearWholeMap() {
-    idOfMarks = 0;
-    result.splice(0, result.length);
-    allRequiredRegions.splice(0, allRequiredRegions.length);
-    console.log(result);
-    console.log(allRequiredRegions);
-    objectManager.removeAll(); //тут лежат точки
-    myMap.geoObjects.removeAll(); //а тут полигоны
-    myMap.geoObjects.add(objectManager); //objectManager лежит в geoObjects
+//удаление меток по региону и году
+function removeSearchByRegion() {
+    let region = searchByRegion.value;
+    let year = searchByYear.value;
+    if (region == '' || region == 'Название региона' || year == '' || year == 'Год поиска') { //чтобы не мучить сервер странными запросами, отсекаем на фронте их
+        alert('Что-то не так с вашим запросом');
+        return;
+    }
+    let isShown = false;
+    let index = 0;
+    for(let i = 0; i < allRequiredRegions.length; i++) {
+        if (allRequiredRegions[i][0] === region && allRequiredRegions[i][1] === year) {
+            isShown = true;
+            index = i;
+            break;
+        }
+    }
+    if(isShown) {
+        console.log(result.get(region + year));
+        objectManager.remove(result.get(region + year));
+        result.delete(region + year); //region и year -- это строки
+        allRequiredRegions.splice(index, 1);
+    }
 }
 
+//запрос и отображене районов города
 function showAllDistricts() {
     let cityName = chooseCitywithDistricts.value;
     console.log(cityName);
@@ -181,4 +193,16 @@ function showAllDistricts() {
             }
         } 
     });
+}
+
+//очистка всей карты
+function clearWholeMap() {
+    idOfMarks = 0;
+    result.clear();
+    allRequiredRegions.splice(0, allRequiredRegions.length);
+    console.log(result);
+    console.log(allRequiredRegions);
+    objectManager.removeAll(); //тут лежат точки
+    myMap.geoObjects.removeAll(); //а тут полигоны
+    myMap.geoObjects.add(objectManager); //objectManager лежит в geoObjects
 }

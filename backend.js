@@ -9,6 +9,10 @@ class CarAccident { //Объекты этого класса передаютс�
           this.fatalities = fatalities; //Погибшие
     }
 }
+//TODO -- написать класс по району
+//вызываем наши БД
+//мб стоит нормально переписать на MongoDB
+//в общем, это мапы
 let carAccidents = {};
 carAccidents['2016'] = require('./2016.json');
 carAccidents['2017'] = require('./2017.json');
@@ -18,6 +22,7 @@ let citiesDistricts = {};
 citiesDistricts["Москва"] = require('./Msk_Dictrict.json');
 citiesDistricts['Санкт-Петербург'] = require('./SPB.json');
 
+//TODO -- подумать над тем, как нам сделать вложенность, т.е. наш сайт со статистикой и инфой
 app.use(express.static('public')); //все данные лежат в папке public
 app.get('/hello', function(req, res) {
     res.send('Server is on!');
