@@ -3,6 +3,9 @@ let objectManager;
 let allRequiredMarksMap = new Map(); //объекты внутри objectManager'a
 let idOfMarks = 0; //считаем айдишники всех меток для корректной работы
 let allRequiredDistrictsMap = new Map();
+let updateMap = false;
+let updateRegion = '';
+let updateYear = '';
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -95,68 +98,74 @@ function initMap() {
 }
 
 //запрос на сервер по региону и году
-function querySearchByRegion() {
+async function querySearchByRegion() {
     let region = searchByRegion.value;
     let year = searchByYear.value;
+    if(updateMap) {
+        region = updateRegion;
+        year = updateYear;
+    }
     if (allRequiredMarksMap.has(region + year)) {
         alert('Что-то не так с вашим запросом');
         return;
     }
-    axios.get('/car_accident_in_region', { params: { regionName: region, year: year } }).then(function (response) {
-        console.log(response);
+    await axios.get('/car_accident_in_region', { params: { regionName: region, year: year } }).then(async function (response) {
+        //console.log(response);
         console.log(response.data.length);
         if (response.data.length === 0) {
             alert('Что-то не так с вашим запросом');
         }
         else {
-            showAccidents(response.data, year);
+            let carAccidents = response.data;
+            //let region = searchByRegion.value;
+            let tmp = [];
+            console.log(allRequiredMarksMap);
+            for (let i = 0; i < carAccidents.length; i++) {
+                let pointColor = 'green';
+                if (year == 2017) {
+                    pointColor = 'blue'
+                } 
+                else if (year == 2018) {
+                    pointColor = 'red'
+                }
+                let pointIcon = 'Auto';
+                if (carAccidents[i].fatalities > 0) {
+                    pointIcon = 'Attention';
+                }
+                let presetPoint = 'islands#' + pointColor + pointIcon + 'CircleIcon';
+                let item =  {
+                    type: 'Feature',
+                    id: idOfMarks,
+                    geometry: {
+                        type: 'Point',
+                        coordinates: carAccidents[i].coordinates
+                    },
+                    properties: {
+                        balloonContentHeader:
+                            'Данные аварии',
+                        balloonContentBody:
+                            '<font size=3><b>Погибшие: </b></font>' + carAccidents[i].fatalities + '<br>' + '<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].victims,
+                    },
+                    options: {
+                        preset: presetPoint
+                    }
+                };
+                idOfMarks += 1;
+                tmp.push(item);
+            }
+            //console.log(tmp);
+            objectManager.add(tmp);
+            allRequiredMarksMap.set(region + year, tmp);
+            console.log(allRequiredMarksMap);
         }
     });
+    console.log('doneQuery');
 }
 
 //непосредственно отображение ДТП
-function showAccidents(carAccidents, year) {
-    let region = searchByRegion.value;
-    let tmp = [];
-    console.log(allRequiredMarksMap);
-    for (let i = 0; i < carAccidents.length; i++) {
-        let pointColor = 'green';
-        if (year == 2017) {
-            pointColor = 'blue'
-        } 
-        else if (year == 2018) {
-            pointColor = 'red'
-        }
-        let pointIcon = 'Auto';
-        if (carAccidents[i].fatalities > 0) {
-            pointIcon = 'Attention';
-        }
-        let presetPoint = 'islands#' + pointColor + pointIcon + 'CircleIcon';
-        let item =  {
-            type: 'Feature',
-            id: idOfMarks,
-            geometry: {
-                type: 'Point',
-                coordinates: carAccidents[i].coordinates
-            },
-            properties: {
-                balloonContentHeader:
-                    'Данные аварии',
-                balloonContentBody:
-					'<font size=3><b>Погибшие: </b></font>' + carAccidents[i].fatalities + '<br>' + '<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].victims,
-            },
-            options: {
-                preset: presetPoint
-            }
-        };
-        idOfMarks += 1;
-        tmp.push(item);
-    }
-    console.log(tmp);
-    objectManager.add(tmp);
-    allRequiredMarksMap.set(region + year, tmp);
-    console.log(allRequiredMarksMap.get(region + year));
-}
+//function showAccidents(carAccidents, year) {
+    
+//}
 
 //удаление меток по региону и году
 function removeSearchByRegion() {
@@ -171,8 +180,30 @@ function removeSearchByRegion() {
 
 function postSendNumberOfAccidents() {
     let num = Number(firstNumberOfAccidents.value);
-    axios.get('/post_first_searches', { params: { firstN: num } }).then(function (response) {
+    axios.get('/post_first_searches', { params: { firstN: num } }).then(async function (response) {
         console.log(response.data);
+        let tmp = new Map(); //копируем allRequiredMarksMap в tmp
+        for (const [key, value] of allRequiredMarksMap.entries()) { //потому что позже мы этот мап удалим, чтобы заново всё отрисовать
+            tmp.set(key, value);
+        }
+        console.log(tmp.size);
+        console.log(tmp);
+        if(tmp.size == 0) {
+            return;
+        }
+        updateMap = true;
+        objectManager.removeAll();
+        allRequiredMarksMap.clear();
+        //tmp.forEach(updateWholeMap);
+        for (const [key, value] of tmp.entries()) { //потому что позже мы этот мап удалим, чтобы заново всё отрисовать
+            updateRegion = key.substring(0, key.length - 4);
+            updateYear = key.substring(key.length - 4, key.length);
+            console.log(updateRegion, updateYear);
+            await querySearchByRegion();
+        }
+        updateMap = false;
+        console.log(tmp);
+        console.log(allRequiredMarksMap);
     });
 }
 
