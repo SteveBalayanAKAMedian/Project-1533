@@ -1,4 +1,5 @@
 #map {
+    display: inline-block;
     width: 1280px;
     height: 720px;
 }
@@ -10,4 +11,29 @@
 }
 .ymaps-2-1-76-copyright ymaps-2-1-76-copyright_logo_no{
     visibility: hidden;
+}
+
+#controlPanel {
+    vertical-align: top;
+    display: inline-block;
+}
+
+#someInfo {
+    height: 100px;
+}
+
+#searchByRegion {
+    width: 250px;
+}
+
+#searchByYear {
+    width: 50px;
+}
+
+#firstNumberOfAccidents {
+    width: 200px;
+}
+
+.wrapper {
+    height: 40px;
 }
