@@ -12,8 +12,6 @@ document.addEventListener('DOMContentLoaded', init);
 //инициализация всего
 //TODO -- 100500 кнопок переписать на нормальные менюшки
 //TODO -- переписать init, добавив много маленьких функций-инициализаторов, а то много и не оч понятно/приятно
-//функция по размеру должна влезать на один экран
-//у меня вот не влезла
 function init() {
     ymaps.ready(initMap);
     //поисковая строка отображения ДТП по регионам
@@ -34,6 +32,7 @@ function init() {
     let yearNumberTextBox = false; 
     let districtsTextBox = false;
     let numberOfAccidentsTextBox = false;
+    //мб вот эту штуку можно как-то автоматизировать
     chooseCitywithDistricts.addEventListener('click', () => {
         if(!districtsTextBox) {
             chooseCitywithDistricts.value = "";
@@ -70,6 +69,9 @@ function init() {
     btnRemoveDistrict.addEventListener('click', clearDistricts)
     let btnSendNumberOfAccidents = document.getElementById('btnSendNumberOfAccidents');
     btnSendNumberOfAccidents.addEventListener('click', postSendNumberOfAccidents);
+    let cityWithStatDistricts = document.getElementById('cityWithStatDistricts');
+    let btnShowCityWithStatDistricts = document.getElementById('btnShowCityWithStatDistricts');
+    btnShowCityWithStatDistricts.addEventListener('click', showCityWithStatDistricts);
 }
 
 //инициализация самой карты
@@ -109,7 +111,7 @@ async function querySearchByRegion() {
         alert('Что-то не так с вашим запросом');
         return;
     }
-    await axios.get('/car_accident_in_region', { params: { regionName: region, year: year } }).then(async function (response) {
+    await axios.get('/car_accident_in_region', { params: { regionName: region, year: year, n: 0 } }).then(async function (response) {
         //console.log(response);
         console.log(response.data.length);
         if (response.data.length === 0) {
@@ -161,11 +163,6 @@ async function querySearchByRegion() {
     });
     console.log('doneQuery');
 }
-
-//непосредственно отображение ДТП
-//function showAccidents(carAccidents, year) {
-    
-//}
 
 //удаление меток по региону и году
 function removeSearchByRegion() {
@@ -237,6 +234,90 @@ function showDistricts() {
             }
         }
         allRequiredDistrictsMap.set(cityName, tmp); 
+    });
+}
+
+//вытаскиваем с сервера информацию по районам и считаем количество ДТП в каждом
+//функция отрабатывает один раз, потому что это precalc
+//результаты работы сохраняем в файлы
+//файлы гоним на сервер
+//оттуда вытаскиваем при новых запросах пользователей
+async function showCityWithStatDistricts() {
+    let cityName = cityWithStatDistricts.value;
+    //объявим это всё заранее, потому что потом передадим на сервер
+    let districtsNames = [];
+    let districtsCoordinates = [];
+    let accidentsArray = [];
+    for(let year = 2016; year <= 2018; ++year) {
+    //написано не очень оптимально, потому что нам не нужно несколько раз выгружать и заново создавать районы,
+    //но т.к. это отработает один раз, то можно забить и переписать сильно позже
+        await axios.get('/car_accident_in_region', { params: { regionName: cityName, year: year, n: 1 } }).then(async function (response1) {
+            let carAccidents = response1.data;
+            await axios.get('/districts_coordinates', { params: { city: cityName } }).then(function (response2) {
+                districtsNames = response2.data[0];
+                districtsCoordinates = response2.data[1];
+                let districtsArray = []; //уже собранные в структуры районы
+                //по массиву с районами
+                for (let i = 0; i < districtsCoordinates.length; i++) {
+                    let tmp = [];
+                    //по массивам подрайонов одного района (тип multipolygon)
+                    for (let j = 0; j < districtsCoordinates[i].length; j++) {
+                        //отдельно по каждой паре координат
+                        for (let k = 0; k < districtsCoordinates[i][j][0].length; k++) { //нулевое -- из-за странной лишней обёртки
+                            let a = Number(districtsCoordinates[i][j][0][k][0]); //какая-то идейность с координатами, почему-то в файлах от
+                            let b = Number(districtsCoordinates[i][j][0][k][1]); //заказчика перепутаны широта с долготой
+                            districtsCoordinates[i][j][0][k][1] = a;
+                            districtsCoordinates[i][j][0][k][0] = b;
+                        }
+                        //взято из документации API карт, без этого нельзя будет пользоваться функцией проверки
+                        //принадлежности точки многоугольнику
+                        var item = new ymaps.Polygon([
+                           districtsCoordinates[i][j][0]
+                        ]);
+                        item.geometry.setMap(myMap);
+                        item.options.setParent(myMap.options);
+                        tmp.push(item);
+                    }
+                    districtsArray.push(tmp);
+                    tmp = [];
+                }
+                //console.log(districtsArray);
+                //console.log(districtsNames);
+                let myMapStruct = new Map();
+                //key -- название района
+                //value -- все ДТП в нём
+                for(let i = 0; i < districtsArray.length; ++i) {
+                    let tmp = [];
+                    for(let j = 0; j < districtsArray[i].length; ++j) {
+                        for(let k = 0; k < carAccidents.length; ++k) {
+                            if(districtsArray[i][j].geometry.contains(carAccidents[k].coordinates)) {
+                                tmp.push(carAccidents[k]);
+                            }
+                        }
+                    }
+                    myMapStruct.set(districtsNames[i], tmp);
+                    tmp = [];
+                }
+                console.log(myMapStruct);
+                let tmp = [];
+                for(const [key, value] of myMapStruct.entries()) {
+                    tmp.push(value);
+                }
+                accidentsArray.push(tmp);
+            });
+        });
+    }
+    console.log(accidentsArray);
+    console.log('flex');
+    axios.post('/districts_save_data', 
+    { 
+        accidentsArray: accidentsArray, 
+        districtsCoordinates: districtsCoordinates, 
+        districtsNames: districtsNames, 
+        cityName: cityName 
+    }).then(function (response) {
+        console.log(response.data);
+
     });
 }
 
