@@ -213,7 +213,17 @@ function showDistricts() {
         return;
     }
     axios.get('/districts_coordinates', { params: { city: cityName } }).then(function(response) {
-        let districtsNames = response.data[0];
+        for(let i = 0; i < response.data.length; i++)
+        {
+            for(let j = 0; j < response.data[i].coordinates.length; j++){
+                /*console.log(response.data[i].coordinates[j]);
+                console.log(response.data[i].coordinates[0]);*/
+                let item = new ymaps.Polygon(response.data[i].coordinates[j], {balloonContentHeader: response.data[i].name, balloonContentBody: 'Количество ДТП ' + response.data[i].accidents.length}, { fillOpacity: 0.5, strokeWidth: 1 });
+                myMap.geoObjects.add(item);
+            }
+            
+        }
+        /*let districtsNames = response.data[0];
         let districtsCoordinates = response.data[1];
         let tmp = [];
         //по массиву с районами
@@ -233,7 +243,7 @@ function showDistricts() {
                 tmp.push(item);
             }
         }
-        allRequiredDistrictsMap.set(cityName, tmp); 
+        allRequiredDistrictsMap.set(cityName, tmp); */
     });
 }
 
