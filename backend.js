@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({
 })); // to support URL-encoded bodies
 
 class CarAccident { //Объекты этого класса передаются во фронт для вывода меток
-    constructor(coordinates, region, victims, fatalities, type) {
+    constructor(coordinates, victims, fatalities, type) {
         this.coordinates = coordinates; 
         this.victims = victims; //Пострадавшие
         this.fatalities = fatalities; //Погибшие
@@ -65,9 +65,10 @@ app.get('/car_accident_in_region', function(req, res) {
     let year = req.query.year;
     //поскольку этот запрос вызывается не только для вывода меток, но и получения всех меток
     //для детальной статистики по районам, то ставим костыль
+    let size = 0;
     if(Number(req.query.n) == 0) {
         //если пользователь задал слишком много ДТП, то не упадёт
-        let size = Math.min(carAccidents[year].length, sizeUsers);
+        size = Math.min(carAccidents[year].length, sizeUsers);
     }
     else {
         size = carAccidents[year].length;
