@@ -41,8 +41,8 @@ carAccidents['2017'] = require('./2017.json');
 carAccidents['2018'] = require('./2018.json');
 
 let citiesDistricts = {};
-citiesDistricts["Москва"] = require('./Msk_Dictrict.json');
-citiesDistricts['Санкт-Петербург'] = require('./SPB.json');
+citiesDistricts["Москва"] = require('./Москва.json');
+citiesDistricts['Санкт-Петербург'] = require('./Санкт-Петербург.json');
 
 //TODO -- подумать над тем, как нам сделать вложенность, т.е. наш сайт со статистикой и инфой
 app.use(express.static('public')); //все данные лежат в папке public
@@ -91,7 +91,41 @@ app.get('/car_accident_in_region', function(req, res) {
 
 //Отправляем координаты районов города
 app.get('/districts_coordinates', function(req, res) {
-    let arrCoordinates = [];
+    let arrOfDistricts = [];
+    for(let i = 0; i < citiesDistricts[req.query.city].Info.length; i++)
+    {
+        let tmp = [];
+        for(let j = 0; j < citiesDistricts[req.query.city].Info[i].accidents.length; j++)
+        {
+            for(k = 0; k < citiesDistricts[req.query.city].Info[i].accidents[j].length; k++)
+            {
+                tmp.push(new CarAccident(
+                    citiesDistricts[req.query.city].Info[i].accidents[j][k].coordinates,
+                    citiesDistricts[req.query.city].Info[i].accidents[j][k].victims,
+                    citiesDistricts[req.query.city].Info[i].accidents[j][k].fatalities,
+                    citiesDistricts[req.query.city].Info[i].accidents[j][k].type
+                    ));
+            }
+        }
+        
+        let item = new DistrictOfTheCity (
+            citiesDistricts[req.query.city].Info[i].coordinates,
+            citiesDistricts[req.query.city].Info[i].name,
+            tmp
+        );
+        for(let j = 0; j < item.coordinates[0].length; j++)
+        {
+            for(let k = 0; k < item.coordinates[j].length; k++)
+            {
+                item.coordinates[0][j][k][0] = Number(item.coordinates[0][j][k][0]);
+                item.coordinates[0][j][k][1] = Number(item.coordinates[0][j][k][1]);
+            }
+        }
+        //console.log(item);
+        arrOfDistricts.push(item);
+    }
+    res.send(arrOfDistricts);
+    /*let arrCoordinates = [];
     let arrNames = [];
     let cityName = req.query.city;
     //нам нужны и названия, и координаты
@@ -100,7 +134,7 @@ app.get('/districts_coordinates', function(req, res) {
         arrNames.push(citiesDistricts[cityName].features[i].properties.DistrName);
         arrCoordinates.push(citiesDistricts[cityName].features[i].geometry.coordinates);
     }
-    res.send([arrNames, arrCoordinates]);
+    res.send([arrNames, arrCoordinates]);*/
 });
 
 //записываем файлы с информацией по районам
