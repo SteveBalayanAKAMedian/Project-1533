@@ -41,8 +41,8 @@ carAccidents['2017'] = require('./2017.json');
 carAccidents['2018'] = require('./2018.json');
 
 let citiesDistricts = {};
-citiesDistricts["Москва"] = require('./Москва.json');
-citiesDistricts['Санкт-Петербург'] = require('./Санкт-Петербург.json');
+citiesDistricts[0] = require('./Москва.json');
+citiesDistricts[1] = require('./Санкт-Петербург.json');
 
 //TODO -- подумать над тем, как нам сделать вложенность, т.е. наш сайт со статистикой и инфой
 app.use(express.static('public')); //все данные лежат в папке public
@@ -73,7 +73,6 @@ app.get('/car_accident_in_region', function(req, res) {
     else {
         size = carAccidents[year].length;
     }
-    //console.log(size);
     let arr = [];
     for (let i = 0; i < size; i++) {
         if (carAccidents[year][i]['reg_name'] == regionName) {
@@ -121,20 +120,9 @@ app.get('/districts_coordinates', function(req, res) {
                 item.coordinates[0][j][k][1] = Number(item.coordinates[0][j][k][1]);
             }
         }
-        //console.log(item);
         arrOfDistricts.push(item);
     }
     res.send(arrOfDistricts);
-    /*let arrCoordinates = [];
-    let arrNames = [];
-    let cityName = req.query.city;
-    //нам нужны и названия, и координаты
-    //я не стал создавать отдельно структуру, так что отправляем пару
-    for(let i = 0; i < citiesDistricts[cityName].features.length; i++) {
-        arrNames.push(citiesDistricts[cityName].features[i].properties.DistrName);
-        arrCoordinates.push(citiesDistricts[cityName].features[i].geometry.coordinates);
-    }
-    res.send([arrNames, arrCoordinates]);*/
 });
 
 //записываем файлы с информацией по районам
@@ -142,7 +130,6 @@ app.get('/districts_coordinates', function(req, res) {
 //но его не буду удалять, т.к. при обновлении датасетов его нужно будет использовать
 app.post('/districts_save_data', function(req, res) {
     console.log('here');
-    //console.log(req.body);
     let accidentsArray = req.body.accidentsArray;
     let districtsCoordinates = req.body.districtsCoordinates;
     let districtsNames = req.body.districtsNames;
