@@ -41,8 +41,8 @@ carAccidents['2017'] = require('./2017.json');
 carAccidents['2018'] = require('./2018.json');
 
 let citiesDistricts = {};
-citiesDistricts["Москва"] = require('./Msk_Dictrict.json');
-citiesDistricts['Санкт-Петербург'] = require('./SPB.json');
+citiesDistricts[0] = require('./Москва.json');
+citiesDistricts[1] = require('./Санкт-Петербург.json');
 
 //TODO -- подумать над тем, как нам сделать вложенность, т.е. наш сайт со статистикой и инфой
 app.use(express.static('public')); //все данные лежат в папке public
@@ -53,7 +53,6 @@ app.listen(8080, function() {
 });
 
 //вообще, это -- post-запрос, но его легче и быстрее оформить как get
-//dont mind, rewrite someday
 app.get('/post_first_searches', function(req, res) {
     sizeUsers = req.query.firstN;
     res.send('OK!');
@@ -65,18 +64,18 @@ app.get('/car_accident_in_region', function(req, res) {
     let year = req.query.year;
     //поскольку этот запрос вызывается не только для вывода меток, но и получения всех меток
     //для детальной статистики по районам, то ставим костыль
-    let size = 0;
-    if(Number(req.query.n) == 0) {
+    //let size = 0;
+    /*if(Number(req.query.n) == 0) {
         //если пользователь задал слишком много ДТП, то не упадёт
         size = Math.min(carAccidents[year].length, sizeUsers);
     }
     else {
         size = carAccidents[year].length;
-    }
-    //console.log(size);
+    }*/
     let arr = [];
-    for (let i = 0; i < size; i++) {
+    for (let i = 0, j = 0; i < carAccidents[year].length && j < sizeUsers; i++) {
         if (carAccidents[year][i]['reg_name'] == regionName) {
+            j++;
             let accidents = new CarAccident(
                 [ Number(carAccidents[year][i]['latitude']), Number(carAccidents[year][i]['longitude'])],
                 carAccidents[year][i]['victims_amount'],
@@ -91,16 +90,7 @@ app.get('/car_accident_in_region', function(req, res) {
 
 //Отправляем координаты районов города
 app.get('/districts_coordinates', function(req, res) {
-    let arrCoordinates = [];
-    let arrNames = [];
-    let cityName = req.query.city;
-    //нам нужны и названия, и координаты
-    //я не стал создавать отдельно структуру, так что отправляем пару
-    for(let i = 0; i < citiesDistricts[cityName].features.length; i++) {
-        arrNames.push(citiesDistricts[cityName].features[i].properties.DistrName);
-        arrCoordinates.push(citiesDistricts[cityName].features[i].geometry.coordinates);
-    }
-    res.send([arrNames, arrCoordinates]);
+   res.send(citiesDistricts[req.query.city].Info);
 });
 
 //записываем файлы с информацией по районам
@@ -108,7 +98,6 @@ app.get('/districts_coordinates', function(req, res) {
 //но его не буду удалять, т.к. при обновлении датасетов его нужно будет использовать
 app.post('/districts_save_data', function(req, res) {
     console.log('here');
-    //console.log(req.body);
     let accidentsArray = req.body.accidentsArray;
     let districtsCoordinates = req.body.districtsCoordinates;
     let districtsNames = req.body.districtsNames;
