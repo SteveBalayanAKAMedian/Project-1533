@@ -6,19 +6,15 @@ let allRequiredDistrictsMap = new Map();
 let updateMap = false;
 let updateRegion = '';
 let updateYear = [true, false, false]; //0 -- это 2016, 1 -- это 2017, 2 -- это 2018 нужна для построения точек
-let areMarksShown = false; //Нужа, чтобы не загружать каждый раз точки заново
+let areMarksShown = false; //Нужна, чтобы не загружать каждый раз точки заново
 let globalZoom = false; //false если не входит
 
 document.addEventListener('DOMContentLoaded', init);
 
 //инициализация всего
-//TODO -- 100500 кнопок переписать на нормальные менюшки
-//TODO -- переписать init, добавив много маленьких функций-инициализаторов, а то много и не оч понятно/приятно
 function init() {
     ymaps.ready(initMap);
-    //кнопка отправки запроса поисковой строки выше
-    let btnClearMap = document.getElementById('btnClearMap');
-    btnClearMap.addEventListener('click', clearWholeMap);
+
     //кнопки выбора года
     let searchByYear2016 = document.getElementById("btnSearchByYear2016");
     searchByYear2016.addEventListener('click', () => {
@@ -50,10 +46,7 @@ function init() {
             removeSearchByRegion(2018);
         }
     });
-    //тут для красоты
     let numberOfAccidentsTextBox = false;
-    //мб вот эту штуку можно как-то автоматизировать
-    
     let firstNumberOfAccidents = document.getElementById('firstNumberOfAccidents');
     firstNumberOfAccidents.value = "Искать среди первых N ДТП";
     firstNumberOfAccidents.addEventListener('click', () => {
@@ -62,8 +55,8 @@ function init() {
             firstNumberOfAccidents.value = "";
         }
     });
-    let btnSendNumberOfAccidents = document.getElementById('btnSendNumberOfAccidents');
-    btnSendNumberOfAccidents.addEventListener('click', postSendNumberOfAccidents);
+    /*let btnSendNumberOfAccidents = document.getElementById('btnSendNumberOfAccidents');
+    btnSendNumberOfAccidents.addEventListener('click', postSendNumberOfAccidents);*/
 }
 
 //инициализация самой карты
@@ -71,8 +64,8 @@ function initMap() {
     myMap = new ymaps.Map(
         'map',
         {
-            center: [55.76, 37.64],
-            zoom: 5
+            center: [57.682891, 34.096125],
+            zoom: 6
         },
         {
             searchControlProvider: 'yandex#search'
@@ -96,7 +89,13 @@ function initMap() {
         axios.get('/districts_coordinates', { params: { city: cityName } }).then(function(response) {
             for(let i = 0; i < response.data.length; i++) {
                 for(let j = 0; j < response.data[i].coordinates.length; j++) {
-                    let item = new ymaps.Polygon(response.data[i].coordinates[j], { balloonContentHeader: response.data[i].name, balloonContentBody: 'Количество ДТП ' + response.data[i].accidents.length}, { fillOpacity: 0.5, strokeWidth: 1 });
+                    let item = new ymaps.Polygon(
+                        response.data[i].coordinates[j], {
+                            balloonContentHeader: response.data[i].name,
+                            balloonContentBody: 'Количество ДТП 2016 ' + response.data[i].accidents[0].length + '<br>' + 'Количество ДТП 2017 ' + response.data[i].accidents[1].length + '<br>' + 'Количество ДТП 2018 ' + response.data[i].accidents[2].length + '<br>' + 'Всего ' + Number(response.data[i].accidents[0].length + response.data[i].accidents[1].length + response.data[i].accidents[2].length)
+                        }, { 
+                            fillOpacity: 0.5, strokeWidth: 1 
+                        });
                     myMap.geoObjects.add(item);
                 }
             
@@ -226,7 +225,7 @@ function postSendNumberOfAccidents() {
 //результаты работы сохраняем в файлы
 //файлы гоним на сервер
 //оттуда вытаскиваем при новых запросах пользователей
-async function showCityWithStatDistricts() {
+/*async function showCityWithStatDistricts() {
     let cityName = cityWithStatDistricts.value;
     //объявим это всё заранее, потому что потом передадим на сервер
     let districtsNames = [];
@@ -303,28 +302,5 @@ async function showCityWithStatDistricts() {
         console.log(response.data);
 
     });
-}
-
-//удаление районов
-function clearDistricts() {
-    let cityName = chooseCitywithDistricts.value;
-    if (allRequiredDistrictsMap.has(cityName)) {
-        let tmp = allRequiredDistrictsMap.get(cityName);
-        for(let i = 0; i < tmp.length; i++) {
-            myMap.geoObjects.remove(tmp[i]);
-        }
-        allRequiredDistrictsMap.delete(cityName);
-    }
-}
-
-//очистка всей карты
-function clearWholeMap() {
-    idOfMarks = 0;
-    allRequiredMarksMap.clear();
-    console.log(allRequiredMarksMap);
-    allRequiredDistrictsMap.clear();
-    objectManager.removeAll(); //тут лежат точки
-    myMap.geoObjects.removeAll(); //а тут полигоны
-    myMap.geoObjects.add(objectManager); //objectManager лежит в geoObjects
-}
+}*/
 

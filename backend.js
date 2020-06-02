@@ -90,39 +90,7 @@ app.get('/car_accident_in_region', function(req, res) {
 
 //Отправляем координаты районов города
 app.get('/districts_coordinates', function(req, res) {
-    let arrOfDistricts = [];
-    for(let i = 0; i < citiesDistricts[req.query.city].Info.length; i++)
-    {
-        let tmp = [];
-        for(let j = 0; j < citiesDistricts[req.query.city].Info[i].accidents.length; j++)
-        {
-            for(k = 0; k < citiesDistricts[req.query.city].Info[i].accidents[j].length; k++)
-            {
-                tmp.push(new CarAccident(
-                    citiesDistricts[req.query.city].Info[i].accidents[j][k].coordinates,
-                    citiesDistricts[req.query.city].Info[i].accidents[j][k].victims,
-                    citiesDistricts[req.query.city].Info[i].accidents[j][k].fatalities,
-                    citiesDistricts[req.query.city].Info[i].accidents[j][k].type
-                    ));
-            }
-        }
-        
-        let item = new DistrictOfTheCity (
-            citiesDistricts[req.query.city].Info[i].coordinates,
-            citiesDistricts[req.query.city].Info[i].name,
-            tmp
-        );
-        for(let j = 0; j < item.coordinates[0].length; j++)
-        {
-            for(let k = 0; k < item.coordinates[j].length; k++)
-            {
-                item.coordinates[0][j][k][0] = Number(item.coordinates[0][j][k][0]);
-                item.coordinates[0][j][k][1] = Number(item.coordinates[0][j][k][1]);
-            }
-        }
-        arrOfDistricts.push(item);
-    }
-    res.send(arrOfDistricts);
+   res.send(citiesDistricts[req.query.city].Info);
 });
 
 //записываем файлы с информацией по районам
