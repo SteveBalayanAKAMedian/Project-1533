@@ -53,7 +53,6 @@ app.listen(8080, function() {
 });
 
 //вообще, это -- post-запрос, но его легче и быстрее оформить как get
-//dont mind, rewrite someday
 app.get('/post_first_searches', function(req, res) {
     sizeUsers = req.query.firstN;
     res.send('OK!');
@@ -65,17 +64,18 @@ app.get('/car_accident_in_region', function(req, res) {
     let year = req.query.year;
     //поскольку этот запрос вызывается не только для вывода меток, но и получения всех меток
     //для детальной статистики по районам, то ставим костыль
-    let size = 0;
-    if(Number(req.query.n) == 0) {
+    //let size = 0;
+    /*if(Number(req.query.n) == 0) {
         //если пользователь задал слишком много ДТП, то не упадёт
         size = Math.min(carAccidents[year].length, sizeUsers);
     }
     else {
         size = carAccidents[year].length;
-    }
+    }*/
     let arr = [];
-    for (let i = 0; i < size; i++) {
+    for (let i = 0, j = 0; i < carAccidents[year].length && j < sizeUsers; i++) {
         if (carAccidents[year][i]['reg_name'] == regionName) {
+            j++;
             let accidents = new CarAccident(
                 [ Number(carAccidents[year][i]['latitude']), Number(carAccidents[year][i]['longitude'])],
                 carAccidents[year][i]['victims_amount'],

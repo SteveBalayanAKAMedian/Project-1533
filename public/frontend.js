@@ -32,7 +32,7 @@ function init() {
         if(updateYear[1] && globalZoom) {
             querySearchByRegion(2017);
         }
-        if(!updateYear[0]) {
+        if(!updateYear[1]) {
             removeSearchByRegion(2017);
         }
     });
@@ -42,7 +42,7 @@ function init() {
         if(updateYear[2] && globalZoom) {
             querySearchByRegion(2018);
         }
-        if(!updateYear[0]) {
+        if(!updateYear[2]) {
             removeSearchByRegion(2018);
         }
     });
@@ -55,8 +55,8 @@ function init() {
             firstNumberOfAccidents.value = "";
         }
     });
-    /*let btnSendNumberOfAccidents = document.getElementById('btnSendNumberOfAccidents');
-    btnSendNumberOfAccidents.addEventListener('click', postSendNumberOfAccidents);*/
+    let btnSendNumberOfAccidents = document.getElementById('btnSendNumberOfAccidents');
+    btnSendNumberOfAccidents.addEventListener('click', postSendNumberOfAccidents);
 }
 
 //инициализация самой карты
@@ -109,7 +109,7 @@ function initMap() {
             if(event.get('newZoom') == event.get('oldZoom')) {
                 return;
             }
-            if(event.get('newZoom') >= 10 && !areMarksShown) { //От цифры в этой строке зависит с какого момента будут появляться метки
+            if(event.get('newZoom') >= 13 && !areMarksShown) { //От цифры в этой строке зависит с какого момента будут появляться метки
                 areMarksShown = true;
                 globalZoom = true;
                 for(let i = 0; i < 3; i++) {
@@ -118,7 +118,7 @@ function initMap() {
                     }
                 }
             }
-            if(event.get('newZoom') < 10) {
+            if(event.get('newZoom') < 13) {
                 areMarksShown = false;
                 globalZoom = false;
                 removeAllSearchByRegion();
@@ -158,13 +158,13 @@ async function querySearchByRegion(searchYear) {
                             balloonContentHeader:
                                 'Данные аварии',
                             balloonContentBody:
-                                '<font size=3><b>Погибшие: </b></font>' + carAccidents[i].fatalities + '<br>' + '<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].victims,
+                                '<font size=3><b>Погибшие: </b></font>' + carAccidents[i].fatalities + '<br>' + '<font size=3><b>Пострадавшие: </b></font>' + carAccidents[i].victims + '<br>' + '<font size=3><b>Тип происшествия: </b></font>' + carAccidents[i].type,
                         },
                         options: {
                             preset: presetPoint
                         }
                     };
-                    idOfMarks += 1;
+                    idOfMarks++;
                     tmp.push(item);
                 }
                 objectManager.add(tmp);
@@ -191,32 +191,20 @@ function removeSearchByRegion(year) {
     
 }
 
+//меняет количество выводимых меток в зависимости от желания пользователя
 function postSendNumberOfAccidents() {
     let num = Number(firstNumberOfAccidents.value);
     axios.get('/post_first_searches', { params: { firstN: num } }).then(async function (response) {
-        console.log(response.data);
-        let tmp = new Map(); //копируем allRequiredMarksMap в tmp
-        for (const [key, value] of allRequiredMarksMap.entries()) { //потому что позже мы этот мап удалим, чтобы заново всё отрисовать
-            tmp.set(key, value);
+        if(globalZoom)
+        {
+            objectManager.removeAll(); //Очищает карту, чтобы перестроить всё заново
+            allRequiredMarksMap.clear();
+            for(let i = 0; i < 3; i++) {
+                if(updateYear[i]) {
+                    querySearchByRegion(2016 + Number(i));
+                }
+            }
         }
-        console.log(tmp.size);
-        console.log(tmp);
-        if(tmp.size == 0) {
-            return;
-        }
-        updateMap = true;
-        objectManager.removeAll();
-        allRequiredMarksMap.clear();
-        //tmp.forEach(updateWholeMap);
-        for (const [key, value] of tmp.entries()) { //потому что позже мы этот мап удалим, чтобы заново всё отрисовать
-            updateRegion = key.substring(0, key.length - 4);
-            updateYear = key.substring(key.length - 4, key.length);
-            console.log(updateRegion, updateYear);
-            await querySearchByRegion();
-        }
-        updateMap = false;
-        console.log(tmp);
-        console.log(allRequiredMarksMap);
     });
 }
 
