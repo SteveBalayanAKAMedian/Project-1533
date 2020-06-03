@@ -19,6 +19,13 @@ function init() {
     let searchByYear2016 = document.getElementById("btnSearchByYear2016");
     searchByYear2016.addEventListener('click', () => {
         updateYear[0] = !updateYear[0];
+        if(!updateYear[0]) {
+            searchByYear2016.classList.remove('btn-warning');
+            searchByYear2016.classList.add('btn-primary');
+        } else {
+            searchByYear2016.classList.add('btn-warning');
+            searchByYear2016.classList.remove('btn-primary');
+        }
         if(updateYear[0] && globalZoom) {
             querySearchByRegion(2016);
         } 
@@ -29,6 +36,14 @@ function init() {
     let searchByYear2017 = document.getElementById("btnSearchByYear2017");
     searchByYear2017.addEventListener('click', () => {
         updateYear[1] = !updateYear[1];
+        if(updateYear[1]) {
+            searchByYear2017.classList.add('btn-warning');
+            searchByYear2017.classList.remove('btn-primary');
+        }
+        else {
+            searchByYear2017.classList.remove('btn-warning');
+            searchByYear2017.classList.add('btn-primary');
+        }
         if(updateYear[1] && globalZoom) {
             querySearchByRegion(2017);
         }
@@ -39,6 +54,14 @@ function init() {
     let searchByYear2018 = document.getElementById("btnSearchByYear2018");
     searchByYear2018.addEventListener('click', () => {
         updateYear[2] = !updateYear[2];
+        if(updateYear[2]) {
+            searchByYear2018.classList.add('btn-warning');
+            searchByYear2018.classList.remove('btn-primary');
+        }
+        else {
+            searchByYear2018.classList.remove('btn-warning');
+            searchByYear2018.classList.add('btn-primary');
+        }
         if(updateYear[2] && globalZoom) {
             querySearchByRegion(2018);
         }
