@@ -1,7 +1,8 @@
 #map {
     display: inline-block;
-    width: 1280px;
+    width: 120rem;
     height: 720px;
+    border: 2px solid lightskyblue;
 }
 .ymaps-2-1-76-controls__control_toolbar{
     visibility: hidden;
