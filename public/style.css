@@ -1,6 +1,8 @@
 #map {
-    width: 1280px;
+    display: inline-block;
+    width: 120rem;
     height: 720px;
+    border: 2px solid lightskyblue;
 }
 .ymaps-2-1-76-controls__control_toolbar{
     visibility: hidden;
@@ -10,4 +12,29 @@
 }
 .ymaps-2-1-76-copyright ymaps-2-1-76-copyright_logo_no{
     visibility: hidden;
+}
+
+#controlPanel {
+    vertical-align: top;
+    display: inline-block;
+}
+
+#someInfo {
+    height: 100px;
+}
+
+#searchByRegion {
+    width: 250px;
+}
+
+#searchByYear {
+    width: 50px;
+}
+
+#firstNumberOfAccidents {
+    width: 200px;
+}
+
+.wrapper {
+    height: 40px;
 }
